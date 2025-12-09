@@ -19,7 +19,7 @@ export function SalesChart() {
         </div>
         <div>
           <h3 className="font-semibold text-base md:text-lg">Evolução de Vendas</h3>
-          <p className="text-xs md:text-sm text-muted-foreground">Histórico 2024</p>
+          <p className="text-xs md:text-sm text-muted-foreground">Histórico 2025</p>
         </div>
       </div>
       

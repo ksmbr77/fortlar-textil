@@ -8,13 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Target, Calendar, TrendingUp, Award, Pencil, Check, X } from "lucide-react";
 import { getMesAtual, getMesAnterior, getDiasRestantesMes } from "@/lib/dateUtils";
+import { usePersistentState } from "@/hooks/usePersistentState";
 
 const Metas = () => {
-  const [currentSales, setCurrentSales] = useState(20710.53);
-  const [goalValue, setGoalValue] = useState(70000);
+  const [currentSales, setCurrentSales] = usePersistentState("metas-currentSales", 20710.53);
+  const [goalValue, setGoalValue] = usePersistentState("metas-goalValue", 70000);
   
   // Histórico com datas dinâmicas baseadas no mês atual
-  const [historico, setHistorico] = useState(() => [
+  const [historico, setHistorico] = usePersistentState("metas-historico", [
     { mes: getMesAtual(), meta: 70000, atingido: 20710.53, percentual: 29.6 },
     { mes: getMesAnterior(1), meta: 50000, atingido: 38358.22, percentual: 76.7 },
     { mes: getMesAnterior(2), meta: 10000, atingido: 1481.12, percentual: 14.8 },

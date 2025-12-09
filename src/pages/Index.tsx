@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Header } from "@/components/dashboard/Header";
 import { EditableStatCard } from "@/components/dashboard/EditableStatCard";
@@ -13,17 +12,18 @@ import {
   Package 
 } from "lucide-react";
 import { getMesAtual } from "@/lib/dateUtils";
+import { usePersistentState } from "@/hooks/usePersistentState";
 
 const Index = () => {
-  const [salesData, setSalesData] = useState({
+  const [salesData, setSalesData] = usePersistentState("fortlar-sales-data", {
     vendas30dias: "R$ 57.516,83",
     vendasMes: "R$ 20.710,53",
     metaMensal: "R$ 70.000,00",
     produtosAtivos: "16"
   });
 
-  const [currentSales, setCurrentSales] = useState(20710.53);
-  const [goalValue, setGoalValue] = useState(70000);
+  const [currentSales, setCurrentSales] = usePersistentState("fortlar-current-sales", 20710.53);
+  const [goalValue, setGoalValue] = usePersistentState("fortlar-goal-value", 70000);
 
   const percentage = ((currentSales / goalValue) * 100).toFixed(1);
 

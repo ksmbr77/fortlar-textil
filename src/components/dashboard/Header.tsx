@@ -1,12 +1,23 @@
-import { User, Menu } from "lucide-react";
+import { User, Menu, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { NotificationsPopover } from "./NotificationsPopover";
 import { SearchCommand } from "./SearchCommand";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export function Header() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { signOut, user } = useAuth();
+  const navigate = useNavigate();
   
   const currentDate = new Date().toLocaleDateString('pt-BR', {
     weekday: 'long',
@@ -14,6 +25,16 @@ export function Header() {
     month: 'long',
     day: 'numeric'
   });
+
+  const handleSignOut = async () => {
+    const { error } = await signOut();
+    if (error) {
+      toast.error('Erro ao sair');
+    } else {
+      toast.success('Até logo!');
+      navigate('/auth', { replace: true });
+    }
+  };
 
   return (
     <>
@@ -41,9 +62,22 @@ export function Header() {
           <div className="flex items-center gap-1 md:gap-3 shrink-0">
             <SearchCommand />
             <NotificationsPopover />
-            <Button variant="ghost" size="icon" className="rounded-full bg-primary/10">
-              <User className="w-4 h-4 md:w-5 md:h-5 text-primary" />
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="rounded-full bg-primary/10">
+                  <User className="w-4 h-4 md:w-5 md:h-5 text-primary" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem className="text-muted-foreground text-xs">
+                  {user?.email}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleSignOut} className="text-destructive cursor-pointer">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sair
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>

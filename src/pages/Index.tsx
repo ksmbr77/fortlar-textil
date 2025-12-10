@@ -5,6 +5,7 @@ import { EditableGoalProgress } from "@/components/dashboard/EditableGoalProgres
 import { ProductRanking } from "@/components/dashboard/ProductRanking";
 import { SalesChart } from "@/components/dashboard/SalesChart";
 import { WhatsAppButton } from "@/components/dashboard/WhatsAppButton";
+import { AIAssistant } from "@/components/dashboard/AIAssistant";
 import { 
   ShoppingBag, 
   Target, 
@@ -108,6 +109,13 @@ const Index = () => {
       </div>
       
       <WhatsAppButton />
+      <AIAssistant 
+        salesData={{
+          currentSales,
+          goalValue,
+          salesData30Days: parseFloat(salesData.vendas30dias.replace(/[^\d.,]/g, '').replace(',', '.')) || 0,
+        }}
+      />
     </div>
   );
 };

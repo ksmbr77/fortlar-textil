@@ -14,7 +14,57 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      dashboard_settings: {
+        Row: {
+          created_at: string
+          id: string
+          setting_key: string
+          setting_value: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          setting_key: string
+          setting_value: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      goals_history: {
+        Row: {
+          atingido: number
+          created_at: string
+          id: string
+          meta: number
+          month: string
+          updated_at: string
+        }
+        Insert: {
+          atingido?: number
+          created_at?: string
+          id?: string
+          meta?: number
+          month: string
+          updated_at?: string
+        }
+        Update: {
+          atingido?: number
+          created_at?: string
+          id?: string
+          meta?: number
+          month?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

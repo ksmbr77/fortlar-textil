@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Sidebar } from "@/components/dashboard/Sidebar";
 import { Header } from "@/components/dashboard/Header";
 import { EditableGoalProgress } from "@/components/dashboard/EditableGoalProgress";
@@ -8,20 +8,31 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Target, Calendar, TrendingUp, Award, Pencil, Check, X } from "lucide-react";
 import { getMesAtual, getMesAnterior, getDiasRestantesMes } from "@/lib/dateUtils";
-import { usePersistentState } from "@/hooks/usePersistentState";
+import { useDatabaseState, useGoalsHistory } from "@/hooks/useDatabaseState";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Metas = () => {
-  const [currentSales, setCurrentSales] = usePersistentState("metas-currentSales", 20710.53);
-  const [goalValue, setGoalValue] = usePersistentState("metas-goalValue", 70000);
+  const [currentSales, setCurrentSales, isLoadingCurrentSales] = useDatabaseState("metas-currentSales", 20710.53);
+  const [goalValue, setGoalValue, isLoadingGoalValue] = useDatabaseState("metas-goalValue", 70000);
+  const { historico, setHistorico, isLoading: isLoadingHistorico } = useGoalsHistory();
   
-  // Histórico com datas dinâmicas baseadas no mês atual
-  const [historico, setHistorico] = usePersistentState("metas-historico", [
+  // Dados padrão para histórico se não houver dados no banco
+  const defaultHistorico = useMemo(() => [
     { mes: getMesAtual(), meta: 70000, atingido: 20710.53, percentual: 29.6 },
     { mes: getMesAnterior(1), meta: 50000, atingido: 38358.22, percentual: 76.7 },
     { mes: getMesAnterior(2), meta: 10000, atingido: 1481.12, percentual: 14.8 },
     { mes: getMesAnterior(3), meta: 5000, atingido: 520.91, percentual: 10.4 },
     { mes: getMesAnterior(4), meta: 5000, atingido: 0, percentual: 0 },
-  ]);
+  ], []);
+
+  // Inicializar histórico se estiver vazio
+  useEffect(() => {
+    if (!isLoadingHistorico && historico.length === 0) {
+      setHistorico(defaultHistorico);
+    }
+  }, [isLoadingHistorico, historico.length, setHistorico, defaultHistorico]);
+
+  const displayHistorico = historico.length > 0 ? historico : defaultHistorico;
 
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editValues, setEditValues] = useState({ meta: "", atingido: "" });
@@ -32,24 +43,27 @@ const Metas = () => {
   const remaining = Math.max(0, goalValue - currentSales);
   const dailyAverage = daysRemaining > 0 ? remaining / daysRemaining : 0;
 
+  const isLoading = isLoadingCurrentSales || isLoadingGoalValue || isLoadingHistorico;
+
   const handleStartEdit = (index: number) => {
     setEditingIndex(index);
     setEditValues({
-      meta: historico[index].meta.toString(),
-      atingido: historico[index].atingido.toString()
+      meta: displayHistorico[index].meta.toString(),
+      atingido: displayHistorico[index].atingido.toString()
     });
   };
 
   const handleSaveEdit = (index: number) => {
-    const newMeta = parseFloat(editValues.meta) || historico[index].meta;
-    const newAtingido = parseFloat(editValues.atingido) || historico[index].atingido;
+    const newMeta = parseFloat(editValues.meta) || displayHistorico[index].meta;
+    const newAtingido = parseFloat(editValues.atingido) || displayHistorico[index].atingido;
     const newPercentual = newMeta > 0 ? (newAtingido / newMeta) * 100 : 0;
 
-    setHistorico(prev => prev.map((item, i) => 
+    const updatedHistorico = displayHistorico.map((item, i) => 
       i === index 
         ? { ...item, meta: newMeta, atingido: newAtingido, percentual: newPercentual }
         : item
-    ));
+    );
+    setHistorico(updatedHistorico);
     setEditingIndex(null);
   };
 
@@ -128,7 +142,7 @@ const Metas = () => {
             </div>
 
             <div className="space-y-3 md:space-y-4">
-              {historico.map((item, index) => (
+              {displayHistorico.map((item, index) => (
                 <div 
                   key={item.mes}
                   className="flex flex-col sm:flex-row sm:items-center justify-between p-3 md:p-4 rounded-xl bg-secondary/50 hover:bg-secondary transition-all duration-300 animate-slide-up opacity-0 group gap-3"

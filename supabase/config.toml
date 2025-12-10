@@ -1,1 +1,4 @@
 project_id = "buxzuqrjtzdxcorxbfzu"
+
+[functions.sales-assistant]
+verify_jwt = false
